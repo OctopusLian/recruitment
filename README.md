@@ -24,4 +24,7 @@ python manage.py makemigrations
 
 # 使改动生效
 python manage.py migrate
+
+# 创建应用
+python manage.py startapp <应用名称>
 ```
