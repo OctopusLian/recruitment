@@ -16,7 +16,7 @@ INTERVIEW_RESULT_TYPE = ((u'建议录用', u'建议录用'), (u'待定', u'待�
 # HR终面结论
 HR_SCORE_TYPE = (('S', 'S'), ('A', 'A'), ('B', 'B'), ('C', 'C'))
 
-
+# 候选人面试信息
 class Candidate(models.Model):
     # 基础信息
     userid = models.IntegerField(unique=True, blank=True, null=True, verbose_name=u'应聘者ID')

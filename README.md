@@ -27,4 +27,7 @@ python manage.py migrate
 
 # 创建应用
 python manage.py startapp <应用名称>
+
+# 导入csv文件
+python manage.py import_candidates --path candidates.csv
 ```
