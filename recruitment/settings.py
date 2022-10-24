@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
+import os.path
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -133,3 +133,42 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # TODO: LDAP配置
+
+# 日志
+LOGGING = {
+    'version': 1,   # 日志记录格式的版本号
+    'disable_existing_loggers': False, # 是否禁用现在已有的其他logger
+    'formatters': {
+      'simple': {
+            'formar': '%(asctime)s %(name)-12s %(lineno)d %(levelname)-8s %(message)s'
+      },
+    },
+
+    # 'handlers': { # 定义一系列的处理链
+    #     "console": {
+    #         "class": "logging.StreamHandler",
+    #         'formatters': 'simple',
+    #     },
+    #     'mail_admins': {
+    #         'level': 'ERROR',
+    #         'class': 'django.utils.log.AdminEmailHandler',
+    #     },
+    #     'file': {
+    #         'class': 'logging.FileHandler',
+    #         'formatters': 'simple',
+    #         'filename': os.path.join(os.path.dirname(BASE_DIR),'recruitment.admin.log'),
+    #     },
+    # },
+    #
+    # 'root': {
+    #     'handlers': ['console', 'file'],
+    #     'level': 'INFO',
+    # },
+    #
+    # "loggers": { # 定义日志记录器
+    #     "django_python3_ldap": {
+    #         "handlers": ["console",'file'],
+    #         "level": "DEBUG", # DEBUG级别以上的日志都会记录下来
+    #     },
+    # },
+}
