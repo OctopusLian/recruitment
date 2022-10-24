@@ -39,6 +39,9 @@ python manage.py startapp <应用名称>
 
 # 导入csv文件
 python manage.py import_candidates --path candidates.csv
+
+# 指定本地开发环境
+python manage.py runserver --settings=settings.local
 ```
 
 ## Open LDAP服务搭建  
