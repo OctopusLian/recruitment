@@ -89,7 +89,7 @@ class Candidate(models.Model):
         db_table = u'candidate'
         verbose_name = u'应聘者'
         verbose_name_plural = u'应聘者'
-
+        # 权限
         permissions = [
             ("export", "Can export candidate list"),
             ("notify", "notify interviewer for candidate review"),

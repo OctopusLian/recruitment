@@ -1,11 +1,13 @@
 import csv
 import logging
 from datetime import datetime
+from django.db.models import Q
 
 from django.contrib import admin
 from django.http import HttpResponse
 
 from interview.models import Candidate
+from interview import candidate_field as cf
 
 
 
@@ -43,12 +45,19 @@ def export_model_as_csv(modeladmin, request, queryset):
     return response
 
 export_model_as_csv.short_description = u'导出为CSV文件' # 中文展示
+export_model_as_csv.allowed_permissions = ('export',)
 
 # 候选人管理类
 class CandidateAdmin(admin.ModelAdmin):
     actions = (export_model_as_csv,)
     # 不需要展示的字段
     exclude = ('creator', 'created_date', 'modified_date')
+
+    # 当前用户是否有导出权限：
+    def has_export_permission(self, request):
+        opts = self.opts
+        return request.user.has_perm('%s.%s' % (opts.app_label, "export"))
+
     # 需要展示的字段
     list_display = (
         'username', 'city', 'bachelor_school', 'first_score', 'first_result','first_interviewer_user',
@@ -64,6 +73,26 @@ class CandidateAdmin(admin.ModelAdmin):
 
     ### 列表页排序字段
     ordering = ('hr_result', 'second_result', 'first_result')
+
+    # 一面面试官仅填写一面反馈， 二面面试官可以填写二面反馈
+    def get_fieldsets(self, request, obj=None):
+        group_names = self.get_group_names(request.user)
+
+        if 'interviewer' in group_names and obj.first_interviewer_user == request.user:
+            return cf.default_fieldsets_first
+        if 'interviewer' in group_names and obj.second_interviewer_user == request.user:
+            return cf.default_fieldsets_second
+        return cf.default_fieldsets
+
+    # 对于非管理员，非HR，获取自己是一面面试官或者二面面试官的候选人集合:s
+    def get_queryset(self, request):  # show data only owned by the user
+        qs = super(CandidateAdmin, self).get_queryset(request)
+
+        group_names = self.get_group_names(request.user)
+        if request.user.is_superuser or 'hr' in group_names:
+            return qs
+        return Candidate.objects.filter(
+            Q(first_interviewer_user=request.user) | Q(second_interviewer_user=request.user))
 
     def get_list_editable(self, request):
         group_names = self.get_group_names(request.user)
