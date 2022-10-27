@@ -8,7 +8,9 @@ from django.http import HttpResponse
 
 from interview.models import Candidate
 from interview import candidate_field as cf
-
+# from .tasks import send_dingtalk_message
+from .dingtalk import send
+from django.contrib import messages
 
 
 # Register your models here.
@@ -18,6 +20,21 @@ logger = logging.getLogger(__name__)
 # define export action
 exportable_fields = ('username', 'city', 'phone', 'bachelor_school', 'master_school', 'degree', 'first_result', 'first_interviewer_user',
                      'second_result', 'second_interviewer_user', 'hr_result', 'hr_score', 'hr_remark', 'hr_interviewer_user')
+
+# 通知一面面试官面试
+def notify_interviewer(modeladmin, request, queryset):
+    candidates = ""
+    interviewers = ""
+    for obj in queryset:
+        candidates = obj.username + ";" + candidates
+        interviewers = obj.first_interviewer_user.username + ";" + interviewers
+    # 这里的消息发送到钉钉， 或者通过 Celery 异步发送到钉钉
+    send ("候选人 %s 进入面试环节，亲爱的面试官，请准备好面试： %s" % (candidates, interviewers) )
+    # send_dingtalk_message.delay("候选人 %s 进入面试环节，亲爱的面试官，请准备好面试： %s" % (candidates, interviewers))
+    messages.add_message(request, messages.INFO, '已经成功发送面试通知')
+
+notify_interviewer.short_description = u'通知一面面试官'
+
 def export_model_as_csv(modeladmin, request, queryset):
     response = HttpResponse(content_type='text/csv')
     field_list = exportable_fields
@@ -49,7 +66,7 @@ export_model_as_csv.allowed_permissions = ('export',)
 
 # 候选人管理类
 class CandidateAdmin(admin.ModelAdmin):
-    actions = (export_model_as_csv,)
+    actions = (export_model_as_csv,notify_interviewer,)
     # 不需要展示的字段
     exclude = ('creator', 'created_date', 'modified_date')
 
