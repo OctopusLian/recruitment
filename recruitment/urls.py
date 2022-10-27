@@ -19,7 +19,8 @@ from django.urls import path, include
 from django.utils.translation import gettext as _
 
 urlpatterns = [
-    path("", include("jobs.urls")),
+    path(r"^", include("jobs.urls")),
+    path('grappelli/',include('grappelli.urls')),
     path('admin/', admin.site.urls),
 ]
 
